@@ -18,15 +18,15 @@
       document.getElementById("output").textContent = "Enviando...";
 
       fetch("TU_URL_WEBAPP/exec", {
-  method: "POST",
-  body: JSON.stringify({
-    name: "test",
-    time: "12.3"
+      method: "POST",
+      body: JSON.stringify({
+      name: "test",
+      time: "12.3"
+    })
   })
-})
-  .then(r => r.json())
-  .then(data => {
-    console.log("Respuesta:", data);
+      .then(r => r.json())
+      .then(data => {
+      console.log("Respuesta:", data);
   })
   .catch(err => {
     console.error("Error:", err);
