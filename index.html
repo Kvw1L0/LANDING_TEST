@@ -1,71 +1,90 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Álbum Virtual Panini</title>
-  
+  <title>Álbum Gala VELTIS</title>
   <link rel="stylesheet" href="style.css" />
-  
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 </head>
 <body>
 
-  <div id="live-landing" class="hidden live-container">
-    <div id="live-bg" class="live-bg"></div>
-    
-    <div class="live-content">
-        <h1 class="live-title">📸 Recuerdos de la Gira</h1>
-        
-        <div class="photo-stage">
-            <img id="live-image" src="" alt="Cargando..." class="fade-transition">
-            <div id="loading-msg" class="loading-msg">Esperando fotos...</div>
-        </div>
-
-        <div class="live-footer">
-            <p>Sube tu foto escaneando el QR o entrando al link</p>
-            <button class="btn btn-outline" onclick="irAlEditor()">📷 Quiero subir una foto</button>
-        </div>
-    </div>
-  </div>
-
-  <div id="landing-creador" class="landing-page hidden" onclick="iniciarModoCreador()">
+  <!-- Landing Page Inicial -->
+  <div id="landing" class="landing-page" onclick="iniciarAlbum()">
     <div class="landing-content">
-        <h1 class="display-4">¡Bienvenid@ al Álbum!</h1>
-        <p class="lead">Toca para empezar un álbum nuevo.</p>
-        <img src="album-icon.png" alt="Icono" class="album-icon">
+        <p class="lead">Toca la pantalla y comienza a completar tu álbum NOCHE DE ESTRELLAS VELTIS 2025.</p>
     </div>
   </div>
 
-  <div id="vista-editor" class="hidden container">
-    <h1 class="text-center">Mi Álbum de la Gira ✨</h1>
-    <div id="laminas-grid" class="grid-row">
-      </div>
+  <!-- Contenido Principal -->
+  <div id="contenido" class="hidden container">
+    <h1 class="text-center">Mi Álbum de la Gala ✨</h1>
+    
+    <div id="laminas" class="grid-row">
+      <!-- Las tarjetas se generan aquí con JS -->
+    </div>
+    
     <div class="actions">
-      <button class="btn btn-secondary" onclick="compartirAlbum()">📤 Copiar Link del Álbum</button>
-      <button class="btn btn-primary" onclick="volverAlLive()">📺 Ver Presentación</button>
+      <!-- Botón modificado para subir fotos -->
+      <button id="btn-share" class="btn btn-secondary" onclick="subirFotosAlServidor()">
+        ☁️ Enviar mis fotos a la Pantalla
+      </button>
     </div>
   </div>
 
+  <!-- Modal de Cámara -->
   <div id="camera-modal" class="modal hidden">
     <div class="modal-content">
       <h5 id="titulo-lamina"></h5>
+      
       <video id="video" autoplay playsinline></video>
-      <button class="btn btn-secondary btn-sm" onclick="cambiarCamara()">🔄 Girar Cámara</button>
+      
+      <button id="switch-camera" class="btn btn-secondary" onclick="cambiarCamara()">
+        🔄 Cambiar Cámara
+      </button>
       
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="capturarFoto()">📷 Capturar</button>
         <label class="btn btn-outline">
-          Galería
+          Subir desde Galería
           <input type="file" accept="image/*" onchange="subirDesdeGaleria(event)" class="hidden" />
         </label>
       </div>
+
       <button class="modal-close" onclick="cerrarModal()">&times;</button>
     </div>
   </div>
 
+  <!-- CONFIGURACIÓN DE FIREBASE (Tus credenciales reales) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+    import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBP5D1AtaIcklOFJiKnEXKilgsz5-363RE",
+      authDomain: "veltis-data1.firebaseapp.com",
+      projectId: "veltis-data1",
+      storageBucket: "veltis-data1.firebasestorage.app", // Corrección automática para v12
+      messagingSenderId: "607614671540",
+      appId: "1:607614671540:web:8118954f681910ecf995e1"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    
+    // Hacemos las funciones accesibles para script.js
+    window.db = getFirestore(app);
+    window.storage = getStorage(app);
+    window.dbCollection = collection;
+    window.dbAddDoc = addDoc;
+    window.dbTimestamp = serverTimestamp;
+    window.sRef = ref;
+    window.sUpload = uploadString;
+    window.sGetUrl = getDownloadURL;
+    
+    console.log("Firebase conectado correctamente ✅");
+  </script>
+
   <script src="script.js"></script>
 </body>
-</html>
+</html></html>
