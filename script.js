@@ -1,251 +1,228 @@
-// ==========================================
-// 1. CONFIGURACIÓN
-// ==========================================
+/ --- 1. Definir constantes y variables de estado ---
 const laminas = [
-  "Mi mejor amig@", "En mi traje de gala", "El momento más divertido",
-  "Selfie en el bus", "El peor peinado", "Actuando una película",
-  "El paisaje más lindo", "Una foto random"
+  "En mi traje de Gala",
+  "Con mi líder favorito",
+  "Con un reconocido 2025",
+  "Junto a La mesa de la noche",
+  "En la pista de Baile",
+  "Mi Gala en una Foto"
 ];
 
-// Variables Globales
-let db, storage;
-let albumId = null;
 let currentLamina = null;
-let currentCardElement = null;
-let fotosPlaylist = []; // Array con todas las fotos cargadas
-let indiceCarrusel = 0;
-let intervaloCarrusel = null;
+let currentCard = null;
+let stream = null;
+let currentFacingMode = 'user'; 
+// Generamos un ID único para este usuario en esta sesión
+const userId = 'user_' + Math.random().toString(36).substr(2, 9);
 
-// Elementos DOM
-const liveLanding = document.getElementById('live-landing');
-const landingCreador = document.getElementById('landing-creador');
-const vistaEditor = document.getElementById('vista-editor');
-const liveImage = document.getElementById('live-image');
-const liveBg = document.getElementById('live-bg');
-const loadingMsg = document.getElementById('loading-msg');
-const contenedorLaminas = document.getElementById('laminas-grid');
+// --- 2. Asignar variables de elementos ---
+const contenedor = document.getElementById('laminas');
 const modalElement = document.getElementById('camera-modal');
 const video = document.getElementById('video');
+const tituloLamina = document.getElementById('titulo-lamina');
 
-// --- PEGA TU FIREBASE CONFIG AQUÍ ---
-const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_PROYECTO.firebaseapp.com",
-    projectId: "TU_PROYECTO",
-    storageBucket: "TU_PROYECTO.appspot.com",
-    messagingSenderId: "TU_MESSAGING_ID",
-    appId: "TU_APP_ID"
-};
-
-try {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    storage = firebase.storage();
-} catch (e) { console.error(e); }
-
-// ==========================================
-// 2. ROUTER Y ARRANQUE
-// ==========================================
-window.onload = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const idUrl = urlParams.get('album');
-
-    if (idUrl) {
-        // --- MODO LINK: LANDING VIVA ---
-        albumId = idUrl;
-        iniciarLiveLanding();
-    } else {
-        // --- MODO SIN LINK: CREADOR ---
-        generarGridEditor();
-        landingCreador.classList.remove('hidden');
-    }
-};
-
-// ==========================================
-// 3. LÓGICA DE LA LANDING VIVA (CARRUSEL)
-// ==========================================
-
-function iniciarLiveLanding() {
-    landingCreador.classList.add('hidden');
-    vistaEditor.classList.add('hidden');
-    liveLanding.classList.remove('hidden');
-
-    // Escuchar cambios en tiempo real en Firebase
-    db.collection('albums').doc(albumId).onSnapshot((doc) => {
-        if (doc.exists) {
-            const data = doc.data();
-            // Convertir objeto de fotos a array de URLs
-            fotosPlaylist = Object.values(data);
-            
-            if (fotosPlaylist.length > 0) {
-                loadingMsg.style.display = 'none';
-                // Si es la primera carga, iniciar el ciclo
-                if (!intervaloCarrusel) {
-                    mostrarSiguienteFoto(); // Mostrar la primera ya
-                    intervaloCarrusel = setInterval(mostrarSiguienteFoto, 8000); // 8 segundos
-                }
-            }
-        }
-    });
+if (!contenedor || !modalElement || !video || !tituloLamina) {
+    console.error("Error crítico: Faltan elementos. Revisa el HTML.");
 }
 
-function mostrarSiguienteFoto() {
-    if (fotosPlaylist.length === 0) return;
+// --- 3. Funciones Globales ---
 
-    // 1. Efecto Fade Out
-    liveImage.classList.remove('fade-in');
-    liveImage.classList.add('fade-out');
+function iniciarAlbum() {
+  generarAlbum(); 
+  document.getElementById('landing').classList.add('hidden'); 
+  document.getElementById('contenido').classList.remove('hidden');
+}
 
-    // 2. Esperar medio segundo para cambiar la fuente (transición visual)
-    setTimeout(() => {
-        // Actualizar índices
-        indiceCarrusel = (indiceCarrusel + 1) % fotosPlaylist.length;
-        const urlFoto = fotosPlaylist[indiceCarrusel];
-
-        // Cambiar Imagen Central
-        liveImage.src = urlFoto;
+function generarAlbum() {
+    if (!contenedor) return;
+    if (contenedor.children.length > 0) return;
+    
+    laminas.forEach(titulo => {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'grid-col';
         
-        // Cambiar Fondo Borroso
-        liveBg.style.backgroundImage = `url('${urlFoto}')`;
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+        
+        const innerFrame = document.createElement('div');
+        innerFrame.className = 'inner-frame';
+        
+        const p = document.createElement('p');
+        p.className = 'text-center';
+        p.textContent = titulo;
 
-        // Efecto Fade In
-        liveImage.onload = () => {
-            liveImage.classList.remove('fade-out');
-            liveImage.classList.add('fade-in');
-        };
-    }, 500); // 500ms coincide con la transición CSS
-}
+        innerFrame.addEventListener('click', () => {
+            abrirCamara(titulo, innerFrame); 
+        });
 
-function irAlEditor() {
-    // El usuario quiere subir una foto desde la landing
-    liveLanding.classList.add('hidden');
-    vistaEditor.classList.remove('hidden');
-    generarGridEditor(); // Asegurar que el grid esté listo
-    
-    // Cargar las fotos que ya existen en los marcos pequeños
-    db.collection('albums').doc(albumId).get().then(doc => {
-         if(doc.exists) llenarMarcosEditor(doc.data());
+        cardDiv.appendChild(innerFrame);
+        cardDiv.appendChild(p);
+        colDiv.appendChild(cardDiv);
+        contenedor.appendChild(colDiv);
     });
 }
 
-function volverAlLive() {
-    vistaEditor.classList.add('hidden');
-    liveLanding.classList.remove('hidden');
-}
-
-// ==========================================
-// 4. LÓGICA DEL EDITOR (SUBIDA)
-// ==========================================
-
-function iniciarModoCreador() {
-    albumId = 'album-' + Math.random().toString(36).substr(2, 9);
-    window.history.replaceState(null, '', `?album=${albumId}`);
-    landingCreador.classList.add('hidden');
-    vistaEditor.classList.remove('hidden');
-}
-
-function generarGridEditor() {
-    contenedorLaminas.innerHTML = '';
-    laminas.forEach((titulo) => {
-        const div = document.createElement('div');
-        div.className = 'grid-col';
-        div.innerHTML = `
-            <div class="card">
-                <div class="inner-frame" onclick="abrirCamara('${titulo}', this)">
-                    <span style="color:#ccc; font-size:2rem;">+</span>
-                </div>
-                <p>${titulo}</p>
-            </div>
-        `;
-        contenedorLaminas.appendChild(div);
-    });
-}
-
-function llenarMarcosEditor(data) {
-    // Lógica simple para rellenar si ya existen fotos (opcional)
-    // Se basa en coincidencia de títulos si se guardaron con keys específicas
-    // Para simplificar, en este ejemplo el editor empieza vacío visualmente
-    // o requiere lógica más compleja de mapeo de keys.
-}
-
-function compartirAlbum() {
-    const url = window.location.href;
-    if (navigator.share) {
-        navigator.share({ title: 'Álbum Gira', url: url });
-    } else {
-        navigator.clipboard.writeText(url);
-        alert("Link copiado: " + url);
+function cerrarStream() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        if (video) video.srcObject = null;
     }
 }
 
-// ==========================================
-// 5. CÁMARA Y SUBIDA
-// ==========================================
+async function iniciarCamara(facingMode) {
+    cerrarStream(); 
+    if (!video) return;
 
-function abrirCamara(titulo, frameDiv) {
-    currentLamina = titulo;
-    currentCardElement = frameDiv;
-    document.getElementById('titulo-lamina').textContent = titulo;
-    modalElement.classList.remove('hidden');
-    
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
-        .then(s => { 
-            video.srcObject = s; 
-            window.localStream = s;
-        })
-        .catch(() => alert("Error cámara"));
-}
-
-function cerrarModal() {
-    modalElement.classList.add('hidden');
-    if (window.localStream) window.localStream.getTracks().forEach(t => t.stop());
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { exact: facingMode } }
+        });
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+            video.play().catch(e => console.error("Error play:", e));
+        };
+    } catch (error) {
+        console.error("Error cámara:", error);
+        if (facingMode === 'environment') {
+            // Fallback si falla la trasera
+            currentFacingMode = 'user';
+            iniciarCamara('user');
+        } else {
+            alert("No se pudo acceder a la cámara.");
+            cerrarModal(); 
+        }
+    }
 }
 
 function cambiarCamara() {
-    // Lógica simplificada de cambio (requiere detener/reiniciar stream)
-    alert("Función giro pendiente de implementación completa");
+    currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
+    iniciarCamara(currentFacingMode);
 }
 
-async function capturarFoto() {
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-    
-    // Preview inmediata
-    currentCardElement.innerHTML = `<img src="${dataUrl}">`;
-    cerrarModal();
-    
-    await subirAFirebase(dataUrl);
+function abrirCamara(titulo, cardRef) {
+  currentLamina = titulo;
+  currentCard = cardRef;
+  if (tituloLamina) tituloLamina.textContent = titulo;
+  
+  if (modalElement) {
+      modalElement.classList.remove('hidden');
+      currentFacingMode = 'user';
+      iniciarCamara(currentFacingMode);
+  }
 }
 
-function subirDesdeGaleria(e) {
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = async (evt) => {
-        const dataUrl = evt.target.result;
-        currentCardElement.innerHTML = `<img src="${dataUrl}">`;
-        cerrarModal();
-        await subirAFirebase(dataUrl);
-    };
-    reader.readAsDataURL(file);
+function cerrarModal() {
+    if (modalElement) modalElement.classList.add('hidden');
+    cerrarStream(); 
 }
 
-async function subirAFirebase(dataUrl) {
-    if (!albumId) return;
-    const nombre = currentLamina.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    const ref = storage.ref().child(`albums/${albumId}/${nombre}.jpg`);
-    
-    try {
-        const res = await fetch(dataUrl);
-        const blob = await res.blob();
-        await ref.put(blob);
-        const url = await ref.getDownloadURL();
-        
-        await db.collection('albums').doc(albumId).set({
-            [nombre]: url
-        }, { merge: true });
-        
-    } catch (e) { console.error(e); }
+function insertarImagen(dataUrl) {
+  if (!currentCard) return;
+  currentCard.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = dataUrl;
+  img.className = 'shrink-in';
+  currentCard.appendChild(img);
+}
+
+function capturarFoto() {
+  if (!video) return;
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  
+  // Espejo si es cámara frontal (opcional, gusto personal)
+  const ctx = canvas.getContext('2d');
+  if (currentFacingMode === 'user') {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+  }
+  
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // Calidad 0.8 para optimizar
+  insertarImagen(dataUrl);
+  cerrarModal(); 
+}
+
+function subirDesdeGaleria(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    insertarImagen(e.target.result);
+  };
+  reader.readAsDataURL(file);
+  cerrarModal(); 
+}
+
+// --- NUEVA LÓGICA: SUBIR A FIREBASE ---
+async function subirFotosAlServidor() {
+    // Verificamos si Firebase cargó
+    if (!window.db || !window.storage) {
+        alert("Error de conexión. Intenta recargar la página.");
+        return;
+    }
+
+    const btn = document.getElementById('btn-share');
+    const textoOriginal = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Subiendo fotos... ⏳";
+
+    const tarjetas = document.querySelectorAll('.card');
+    let fotosSubidas = 0;
+
+    // Recorremos las tarjetas
+    for (let i = 0; i < tarjetas.length; i++) {
+        const card = tarjetas[i];
+        const img = card.querySelector('img'); 
+        const categoria = card.querySelector('p').textContent;
+
+        // Solo subimos si hay imagen y no tiene la clase 'uploaded' (opcional)
+        if (img) {
+            try {
+                // Nombre único: ID_usuario + timestamp + categoria
+                const timestamp = Date.now();
+                const cleanCat = categoria.replace(/\s+/g, '_').toLowerCase();
+                const nombreArchivo = `gala2025/${userId}_${cleanCat}_${timestamp}.jpg`; 
+                
+                // Referencia al Storage
+                const storageRef = window.sRef(window.storage, nombreArchivo);
+
+                // Subir imagen (base64)
+                await window.sUpload(storageRef, img.src, 'data_url');
+                
+                // Obtener URL pública
+                const urlPublica = await window.sGetUrl(storageRef);
+
+                // Guardar registro en Firestore
+                await window.dbAddDoc(window.dbCollection(window.db, "fotos_gala"), {
+                    usuario: userId,
+                    categoria: categoria,
+                    url_foto: urlPublica,
+                    fecha: window.dbTimestamp()
+                });
+
+                fotosSubidas++;
+                // Marcamos visualmente que se subió (opcional)
+                card.querySelector('.inner-frame').style.borderColor = '#28a745';
+
+            } catch (error) {
+                console.error("Error subiendo foto:", error);
+            }
+        }
+    }
+
+    if (fotosSubidas > 0) {
+        alert(`¡Listo! Se enviaron ${fotosSubidas} fotos a la pantalla grande 🎉`);
+        btn.textContent = "¡Enviado! ✅";
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = textoOriginal;
+        }, 5000);
+    } else {
+        alert("Primero completa alguna lámina del álbum 📸");
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+    }
 }
