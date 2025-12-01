@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page - Fondo.png</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Contenedor Principal (Hero) */
+        .hero-section {
+            /* Aquí cargamos tu imagen */
+            background-image: url('fondo.png'); 
+            
+            /* Ajustes para que la imagen cubra todo y se centre */
+            height: 100%; 
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+        }
+
+        /* Capa oscura superpuesta (Overlay) */
+        /* Esto ayuda a leer el texto si la imagen es muy clara o caótica */
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.5); /* Negro al 50% de opacidad */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 20px;
+        }
+
+        /* Estilos del contenido */
+        .content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+
+        .content p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* Botón de llamada a la acción */
+        .cta-button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background-color: #ff6b6b; /* Color de ejemplo */
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s;
+            font-weight: bold;
+        }
+
+        .cta-button:hover {
+            background-color: #ff4757;
+            transform: scale(1.05);
+        }
+
+        /* Adaptación para móviles */
+        @media (max-width: 768px) {
+            .content h1 { font-size: 2.5rem; }
+            .content p { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero-section">
+        <div class="overlay">
+            <div class="content">
+                <h1>Bienvenido</h1>
+                <p>Esta es la página principal mostrando tu archivo fondo.png como imagen de cobertura total.</p>
+                <a href="#" class="cta-button">Empezar Ahora</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
