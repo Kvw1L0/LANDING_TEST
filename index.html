@@ -3,101 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page - Fondo.png</title>
+    <title>Video Exclusivo - Tu Marca</title>
     <style>
-        /* Reset básico */
+        /* --- RESET Y ESTILOS BASE --- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body, html {
-            height: 100%;
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        /* Contenedor Principal (Hero) */
-        .hero-section {
-            /* Aquí cargamos tu imagen */
-            background-image: url('fondo.jpg'); 
-            
-            /* Ajustes para que la imagen cubra todo y se centre */
-            height: 100%; 
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-            position: relative;
-        }
-
-        /* Capa oscura superpuesta (Overlay) */
-        /* Esto ayuda a leer el texto si la imagen es muy clara o caótica */
-        .overlay {
-            background-color: rgba(0, 0, 0, 0.5); /* Negro al 50% de opacidad */
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            background-color: #0f0f0f; /* Fondo oscuro tipo Netflix/YouTube */
+            color: #ffffff;
+            line-height: 1.6;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: white;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        header {
             padding: 20px;
+            text-align: center;
         }
 
-        /* Estilos del contenido */
-        .content h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-        }
-
-        .content p {
+        .logo {
             font-size: 1.5rem;
-            margin-bottom: 30px;
-            max-width: 600px;
-            line-height: 1.6;
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        /* Botón de llamada a la acción */
-        .cta-button {
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .headline {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .sub-headline {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+            color: #cccccc;
+            max-width: 600px;
+        }
+
+        /* --- VIDEO RESPONSIVE --- */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #000;
+            /* Relación de aspecto 16:9 */
+            aspect-ratio: 16 / 9; 
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* --- SECCIÓN CTA (Llamada a la acción) --- */
+        .cta-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #e50914; /* Rojo vibrante */
+            color: white;
             padding: 15px 40px;
             font-size: 1.2rem;
-            background-color: #ff6b6b; /* Color de ejemplo */
-            color: white;
+            font-weight: bold;
             border: none;
-            border-radius: 50px;
+            border-radius: 5px;
             cursor: pointer;
             text-decoration: none;
-            transition: background-color 0.3s ease, transform 0.2s;
-            font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
+            display: inline-block;
         }
 
-        .cta-button:hover {
-            background-color: #ff4757;
+        .btn-primary:hover {
+            background-color: #f40612;
             transform: scale(1.05);
         }
 
-        /* Adaptación para móviles */
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #555;
+            margin-top: auto;
+        }
+
+        /* --- MEDIA QUERIES (Móvil) --- */
         @media (max-width: 768px) {
-            .content h1 { font-size: 2.5rem; }
-            .content p { font-size: 1.1rem; }
+            .headline { font-size: 1.8rem; }
+            .btn-primary { width: 100%; display: block; }
         }
     </style>
 </head>
 <body>
 
-    <div class="hero-section">
-        <div class="overlay">
-            <div class="content">
-                
-             
-            </div>
+    <header>
+        <div class="logo">TU MARCA</div>
+    </header>
+
+    <main class="main-container">
+        <h1 class="headline">Descubre lo que hemos preparado para ti</h1>
+        <p class="sub-headline">Mira este video corto para entender cómo podemos transformar tus resultados en menos de 3 minutos.</p>
+
+        <div class="video-wrapper">
+            <video controls autoplay muted loop poster="poster-imagen.jpg">
+                <source src="video.mp4" type="video/mp4">
+                Tu navegador no soporta la etiqueta de video.
+            </video>
         </div>
-    </div>
+
+        <div class="cta-section">
+           
+        </div>
+    </main>
+
+    <footer>
+     
+    </footer>
 
 </body>
 </html>
