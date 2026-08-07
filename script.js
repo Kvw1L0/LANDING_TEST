@@ -2,9 +2,9 @@
 // 1. CONSTANTES Y ESTADO GLOBAL
 // ==========================================
 const laminas = [
-  "1. Aquí estoy : mi selfie del evento",
-  "2. Así se vive mi experiencia",
-  "3. Mi momento favorito"
+  "1. POSE DE ROCK STAR",
+  "2. FOTO CON MI BANDA",
+  "3. FOTO PORTADA DE ALBUM"
 ];
 
 let currentLamina = null;
